@@ -57,7 +57,7 @@ jobs:
           ARCH: amd64,arm64
           REGISTRY: ingress-controller
         run: |
-            REGISTRY=docker.io/inspurwydGOOS=linux make  release
+            REGISTRY=docker.io/inspurwyd make  release
 
 
 
