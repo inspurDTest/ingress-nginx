@@ -1789,16 +1789,13 @@ func checkOverlap(ing *networking.Ingress, ingresses []*ingress.Ingress, servers
 				continue
 			}
 
-			// same ingress
-			for _, existing := range existingIngresses {
-				if existing.ObjectMeta.Namespace == ing.ObjectMeta.Namespace && existing.ObjectMeta.Name == ing.ObjectMeta.Name {
-					return nil
-				}
-			}
-
 			// path overlap. Check if one of the ingresses has a canary annotation
 			isCanaryEnabled, annotationErr := parser.GetBoolAnnotation("canary", ing)
 			for _, existing := range existingIngresses {
+			        if existing.ObjectMeta.Namespace == ing.ObjectMeta.Namespace && existing.ObjectMeta.Name == ing.ObjectMeta.Name {
+					continue
+				}
+				
 				isExistingCanaryEnabled, existingAnnotationErr := parser.GetBoolAnnotation("canary", existing)
 
 				if isCanaryEnabled && isExistingCanaryEnabled {
@@ -1809,9 +1806,6 @@ func checkOverlap(ing *networking.Ingress, ingresses []*ingress.Ingress, servers
 					return fmt.Errorf(`host "%s" and path "%s" is already defined in ingress %s/%s`, rule.Host, path.Path, existing.Namespace, existing.Name)
 				}
 			}
-
-			// no overlap
-			return nil
 		}
 	}
 
