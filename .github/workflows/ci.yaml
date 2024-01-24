@@ -3,11 +3,11 @@ name: CI
 on:
   pull_request:
     branches:
-      - "heads/controller-v1.2.0"
+      - "heads/controller-v1.2.0-tet"
 
   push:
     branches:
-      - "heads/controller-v1.2.0"
+      - "heads/controller-v1.2.0-test"
 
 permissions:
   contents: read
