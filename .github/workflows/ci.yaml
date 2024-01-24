@@ -69,7 +69,7 @@ jobs:
           docker login -u inspurwyd  -p  dckr_pat_yMRt21vCZj0PlDl14xJiqSOHeVg
 
       - name: push images
-          run: |
-            docker tag   ingress-controller/controller:1.0.0-dev inspurwyd/ingress-controller:1.0.0-dev
-            docker push  inspurwyd/ingress-controller:1.0.0-dev
+        run: |
+          docker tag   ingress-controller/controller:1.0.0-dev inspurwyd/ingress-controller:1.0.0-dev
+          docker push  inspurwyd/ingress-controller:1.0.0-dev
 
