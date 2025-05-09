@@ -27,6 +27,7 @@ import (
 	apiv1 "k8s.io/api/core/v1"
 	networking "k8s.io/api/networking/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
+	ngconfparser "github.com/Inspur-Data/gonginx/parser"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -342,6 +343,16 @@ func (n *NGINXController) CheckIngress(ing *networking.Ingress) error {
 		return err
 	}
 	*/
+
+	/*Deactivated to mitigate CVE-2025-1974*/
+	/*use pure go to check nginx.conf instead of  nginx -t --start*/
+	ngconfparserInstance := ngconfparser.NewStringParser(string(content))
+	_, err = ngconfparserInstance.Parse()
+	if err != nil {
+		n.metricCollector.IncCheckErrorCount(ing.Namespace, ing.Name)
+		return err
+	}
+	/*use pure go to check nginx.conf instead of  nginx -t  --end*/
 
 	n.metricCollector.IncCheckCount(ing.ObjectMeta.Namespace, ing.Name)
 	endCheck := time.Now().UnixNano() / 1000000
