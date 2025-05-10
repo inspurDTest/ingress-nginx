@@ -26,7 +26,6 @@ import (
 
 	"github.com/onsi/ginkgo"
 	"github.com/stretchr/testify/assert"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/ingress-nginx/test/e2e/framework"
@@ -127,6 +126,7 @@ var _ = framework.IngressNginxDescribe("[Serial] admission controller", func() {
 		assert.NotNil(ginkgo.GinkgoT(), err, "creating an ingress with invalid path should return an error")
 	})
 
+	/* Deactivated to mitigate CVE-2025-1974
 	ginkgo.It("should return an error if there is an error validating the ingress definition", func() {
 		host := "admission-test"
 
@@ -137,6 +137,7 @@ var _ = framework.IngressNginxDescribe("[Serial] admission controller", func() {
 		_, err := f.KubeClientSet.NetworkingV1().Ingresses(f.Namespace).Create(context.TODO(), firstIngress, metav1.CreateOptions{})
 		assert.NotNil(ginkgo.GinkgoT(), err, "creating an ingress with invalid configuration should return an error")
 	})
+	*/
 
 	ginkgo.It("should return an error if there is an invalid value in some annotation", func() {
 		host := "admission-test"
@@ -198,6 +199,7 @@ var _ = framework.IngressNginxDescribe("[Serial] admission controller", func() {
 			Status(http.StatusOK)
 	})
 
+	/* Deactivated to mitigate CVE-2025-1974
 	ginkgo.It("should return an error if the Ingress V1 definition contains invalid annotations", func() {
 		out, err := createIngress(f.Namespace, invalidV1Ingress)
 		assert.Empty(ginkgo.GinkgoT(), out)
@@ -208,7 +210,7 @@ var _ = framework.IngressNginxDescribe("[Serial] admission controller", func() {
 			assert.NotNil(ginkgo.GinkgoT(), err, "creating an ingress with invalid configuration should return an error")
 		}
 	})
-
+	*/
 	ginkgo.It("should not return an error for an invalid Ingress when it has unknown class", func() {
 		out, err := createIngress(f.Namespace, invalidV1IngressWithOtherClass)
 		assert.Equal(ginkgo.GinkgoT(), "ingress.networking.k8s.io/extensions-invalid-other created\n", out)

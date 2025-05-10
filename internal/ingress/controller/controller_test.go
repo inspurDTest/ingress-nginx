@@ -228,7 +228,7 @@ func TestCheckIngress(t *testing.T) {
 				t.Errorf("with a new ingress without error, no error should be returned")
 			}
 		})
-
+		/* Deactivated to mitigate CVE-2025-1974
 		t.Run("When nginx test returns an error", func(t *testing.T) {
 			nginx.command = testNginxTestCommand{
 				t:        t,
@@ -240,6 +240,7 @@ func TestCheckIngress(t *testing.T) {
 				t.Errorf("with a new ingress with an error, an error should be returned")
 			}
 		})
+		*/
 
 		t.Run("When the default annotation prefix is used despite an override", func(t *testing.T) {
 			defer func() {
