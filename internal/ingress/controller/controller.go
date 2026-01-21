@@ -23,11 +23,11 @@ import (
 	"strings"
 	"time"
 
+	ngconfparser "github.com/Inspur-Data/gonginx/parser"
 	"github.com/mitchellh/hashstructure"
 	apiv1 "k8s.io/api/core/v1"
 	networking "k8s.io/api/networking/v1"
 	apiequality "k8s.io/apimachinery/pkg/api/equality"
-	ngconfparser "github.com/Inspur-Data/gonginx/parser"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -1786,6 +1786,8 @@ func checkOverlap(ing *networking.Ingress, ingresses []*ingress.Ingress, servers
 			rule.Host = defServerName
 		}
 
+		ingSecret, _ := GetTLSSecretName(rule.Host, ing)
+
 		for _, path := range rule.HTTP.Paths {
 			if path.Backend.Service == nil {
 				// skip non-service backends
@@ -1808,6 +1810,11 @@ func checkOverlap(ing *networking.Ingress, ingresses []*ingress.Ingress, servers
 			isCanaryEnabled, annotationErr := parser.GetBoolAnnotation("canary", ing)
 			for _, existing := range existingIngresses {
 				if existing.ObjectMeta.Namespace == ing.ObjectMeta.Namespace && existing.ObjectMeta.Name == ing.ObjectMeta.Name {
+					continue
+				}
+
+				existsIngSecret, _ := GetTLSSecretName(rule.Host, existing)
+				if (ingSecret == "" && existsIngSecret != "") || (ingSecret != "" && existsIngSecret == "") {
 					continue
 				}
 
@@ -1860,4 +1867,32 @@ func (n *NGINXController) getStreamSnippets(ingresses []*ingress.Ingress) []stri
 		snippets = append(snippets, i.ParsedAnnotations.StreamSnippet)
 	}
 	return snippets
+}
+
+func GetTLSSecretName(host string, ing *networking.Ingress) (string, error) {
+	if ing == nil {
+		return "", fmt.Errorf("ingress object is nil")
+	}
+	if host == "" {
+		return "", fmt.Errorf("host parameter is empty")
+	}
+
+	if ing.Spec.TLS == nil || len(ing.Spec.TLS) == 0 {
+		return "", fmt.Errorf("ingress %s/%s has no TLS configuration",
+			ing.Namespace, ing.Name)
+	}
+
+	for _, tls := range ing.Spec.TLS {
+		for _, h := range tls.Hosts {
+			if h == host {
+				if tls.SecretName == "" {
+					return "", fmt.Errorf("found matching host %s but secretName is empty", host)
+				}
+				return tls.SecretName, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("host %s not found in TLS configuration of ingress %s/%s",
+		host, ing.Namespace, ing.Name)
 }
