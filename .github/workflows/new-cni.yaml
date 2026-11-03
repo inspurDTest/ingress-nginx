@@ -29,6 +29,11 @@ jobs:
         with:
           go-version: '1.17.6'
 
+      - name: Resolve Go dependencies
+        run: |
+          go mod tidy
+          go mod download
+
       - name: Set up Docker Buildx
         id: buildx
         uses: crazy-max/ghaction-docker-buildx@e01797ad2ea9a981005ad58c99afa8d842e3d3eb # v1
