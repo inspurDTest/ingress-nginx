@@ -31,7 +31,7 @@ jobs:
 
       - name: Resolve Go dependencies
         run: |
-          go mod tidy
+          go mod tidy -compat=1.17
           go mod download
 
       - name: Set up Docker Buildx
